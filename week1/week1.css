@@ -99,6 +99,13 @@ body{
         background-position: center;
         position: relative;
     }
+    
+    .box img{
+        position: absolute;
+        opacity: 0.5;
+        top:10px;
+        right:10px;
+    }
 
     .box-title{
         background-color: white;
