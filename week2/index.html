@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>week2-assignment周意惠</title>
+  </head>
+  <body>
+    <script>
+      function findAndPrint(messages, currentStation) {
+        let greenLine = [
+          "Songshan",
+          "Nanjing Sanmin",
+          "Taipei Arena",
+          "Nanjing Fuxing",
+          "Songiang Nanjing",
+          "Zhongshan",
+          "Beimen",
+          "Ximen",
+          "Xiaonanmen",
+          "Chiang Kai-Shek Memorial Hall",
+          "Guting",
+          "Taipower Building",
+          "Gongguan",
+          "Wanlong",
+          "Jingmei",
+          "Dapinglin",
+          "Qizhang",
+          "Xindian City Hall",
+          "Xindian",
+        ];
+        let currentStationIndex = greenLine.indexOf(currentStation); //找出此站的index
+        console.log(Object.keys(messages));
+        // for array
+        for (const item of greenLine) {
+            console.log(item);
+        }
+        // for object
+        for (const key in messages) {
+          console.log(key);
+        }
+
+        const keys = Object.keys(messages);
+        for (i = 0; i < keys.length; i++) {
+          console.log(keys[i]);
+        }
+      }
+
+      const messages = {
+        Bob: "I'm at Ximen MRT station.",
+        Mary: "I have a drink near Jingmei MRT station.",
+        Copper: "I just saw a concert at Taipei Arena.",
+        Leslie: "I'm at home near Xiaobitan station.",
+        Vivian: "I'm at Xindian station waiting for you.",
+      };
+
+      findAndPrint(messages, "Wanlong"); // print Mary
+      //   findAndPrint(messages, "Songshan"); // print Copper
+      //   findAndPrint(messages, "Qizhang"); // print Leslie
+      //   findAndPrint(messages, "Ximen"); // print Bob
+      //   findAndPrint(messages, "Xindian City Hall"); // print Vivian
+    </script>
+  </body>
+</html>
