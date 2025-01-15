@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>week2-assignment周意惠</title>
+  </head>
+  <body>
+    <script>
+      console.log("***Task 1***");
+      function findAndPrint(messages, currentStation) {
+        greenLine = [
+          "Songshan",
+          "Nanjing Sanmin",
+          "Taipei Arena",
+          "Nanjing Fuxing",
+          "Songiang Nanjing",
+          "Zhongshan",
+          "Beimen",
+          "Ximen",
+          "Xiaonanmen",
+          "Chiang Kai-Shek Memorial Hall",
+          "Guting",
+          "Taipower Building",
+          "Gongguan",
+          "Wanlong",
+          "Jingmei",
+          "Dapinglin",
+          "Qizhang",
+          "Xindian City Hall",
+          "Xindian",
+        ];
+        let QizhangIndex = greenLine.indexOf("Qizhang"); //計算Qizhang的Index
+        let currentStationIndex = greenLine.indexOf(currentStation); //計算currentStation的Index
+        // 計算每個站與currentstation的距離，生成一個物件
+        let distanceOfStation = {}; //distanceOfStation用來傳入與每個站的距離
+        // (1)如果搜尋的站在小碧潭，
+        if (currentStation === "Xiaobitan") {
+          distanceOfStation["Xiaobitan"] = 0; //新增小碧潭站的距離為0
+          for (i = 0; i < greenLine.length + 1; i++) {
+            distanceOfStation[greenLine[i]] = Math.abs(QizhangIndex - i) + 1;
+          }
+          distanceOfStation = Object.entries(distanceOfStation);
+        }
+        // (2)如果搜尋的站不在小碧潭，(也要新增小碧潭站的距離)
+        else {
+          for (i = 0; i < greenLine.length + 1; i++) {
+            distanceOfStation[greenLine[i]] = Math.abs(i - currentStationIndex);
+          }
+          distanceOfStation["Xiaobitan"] =
+            Math.abs(QizhangIndex - currentStationIndex) + 1;
+          distanceOfStation = Object.entries(distanceOfStation);
+        }
+        distanceOfStation.sort((a, b) => a[1] - b[1]); //將距離由小排到大
+        //找有沒有人在currentStation
+        //寫一個迴圈代入distanceOfStation，比對messages的每筆資料是不是有入distanceOfStation的資料
+        let station = distanceOfStation[0][0];
+        for (let [name, message] of Object.entries(messages)) {
+          if (message.includes(station)) {
+            console.log(name);
+            return;
+          }
+        }
+        //找距離最近的人
+        for (i = 0; i < 21; i++) {
+          let station = distanceOfStation[i][0];
+          for (let [name, message] of Object.entries(messages)) {
+            if (message.includes(station)) {
+              console.log(name);
+              return;
+            }
+          }
+        }
+      }
+      const messages = {
+        Bob: "I'm at Ximen MRT station.",
+        Mary: "I have a drink near Jingmei MRT station.",
+        Copper: "I just saw a concert at Taipei Arena.",
+        Leslie: "I'm at home near Xiaobitan station.",
+        Vivian: "I'm at Xindian station waiting for you.",
+      };
+      findAndPrint(messages, "Wanlong"); // print Mary
+      findAndPrint(messages, "Songshan"); // print Copper
+      findAndPrint(messages, "Qizhang"); // print Leslie
+      findAndPrint(messages, "Ximen"); // print Bob
+      findAndPrint(messages, "Xindian City Hall"); // print Vivian
+
+      console.log("***Task 2***");
+      var consultantsTime = {};
+      function book(consultants, hour, duration, criteria) {
+        let time = [];
+        //先做一個consultants的深拷貝
+        // let copyConsultants=JSON.parse(JSON.stringify(consultants));
+        for (i = 0; i < 24; i++) {
+          time.push(i);
+        }
+        //先做一個時間物件 {"John":[0,1,2,3,4...,23], "Bob":[0,1,2,3,4...,23]...}
+        if (Object.keys(consultantsTime).length === 0) {
+          for (let { name, rate, price } of consultants) {
+            consultantsTime[name] = [...time];
+          }
+        }
+        //有空的顧問列表
+        let consultant = [];
+        //根據輸入的資料找出有空的顧問
+        //(1)根據輸入的資料生成一個要求的時間列表，例如輸入hour,dutation為2,3，生成一個array[2,3,4]
+        let requestTime = [];
+        for (i = hour; i < hour + duration; i++) {
+          requestTime.push(i);
+        }
+        //(2-1)比對顧問時間列表，列出時間對的上的顧問，並在列表中添加名字
+        for (let [name, time] of Object.entries(consultantsTime)) {
+          if (requestTime.every((t) => time.includes(t))) {
+            consultant.push(name);
+          }
+        }
+        //(2-2)如果consultants中沒有資料，return"No Service"
+        if (Object.entries(consultant).length === 0) {
+          console.log("No Service");
+          return;
+        }
+        //(3)根據(2-1)生成的consultant列表及criterua生成篩選標準的字典
+        // critera為price
+        if (criteria === "price") {
+          let priceList = {};
+          for (i = 0; i < consultant.length; i++) {
+            for (let item of consultants) {
+              if (consultant[i] === item.name) {
+                priceList[consultant[i]] = item.price;
+              }
+            }
+          }
+          priceList = Object.entries(priceList);
+          priceList.sort((a, b) => a[1] - b[1]);
+          console.log(priceList[0][0]);
+          //刪除所選顧問的時間列表
+          for (let item in consultantsTime) {
+            if (priceList[0][0] === item) {
+              consultantsTime[priceList[0][0]].splice(hour, duration);
+            }
+          }
+        }
+        // critera為rate
+        if (criteria === "rate") {
+          let rateList = {};
+          for (i = 0; i < consultant.length; i++) {
+            for (let item of consultants) {
+              if (consultant[i] === item.name) {
+                rateList[consultant[i]] = item.rate;
+              }
+            }
+          }
+          rateList = Object.entries(rateList);
+          rateList.sort((a, b) => b[1] - a[1]);
+          console.log(rateList[0][0]);
+          //刪除所選顧問的時間列表
+          for (let item in consultantsTime) {
+            if (rateList[0][0] === item) {
+              consultantsTime[rateList[0][0]].splice(hour, duration);
+            }
+          }
+        }
+      }
+      const consultants = [
+        { name: "John", rate: 4.5, price: 1000 },
+        { name: "Bob", rate: 3, price: 1200 },
+        { name: "Jenny", rate: 3.8, price: 800 },
+      ];
+      book(consultants, 15, 1, "price"); // Jenny
+      book(consultants, 11, 2, "price"); // Jenny
+      book(consultants, 10, 2, "price"); // John
+      book(consultants, 20, 2, "rate"); // John
+      book(consultants, 11, 1, "rate"); // Bob
+      book(consultants, 11, 2, "rate"); // No Service
+      book(consultants, 14, 3, "price"); // John
+
+      console.log("***Task 3***");
+      function func(...data) {
+        //將所有人的中間名依次放入middleName陣列，生成：['大', '明', '明']
+        let middleName = [];
+        for (let name of data) {
+          //名字為兩個字或三個字
+          if (name.length == 2 || name.length == 3) {
+            middleName.push(name[1]);
+          }
+          if (name.length == 4 || name.length == 5) {
+            middleName.push(name[2]);
+          }
+        }
+        //刪除重複的值
+        let repeat = new Set();
+        let result = new Set();
+        //三元運算，產生兩個集合repeat放有重複的資料，result放有出現過的資料但不重複
+        middleName.forEach((item) => {
+          result.has(item) ? repeat.add(item) : result.add(item);
+        });
+        //將重複的集合轉為陣列Array.from
+        Array.from(repeat);
+        //copyMiddleNmane 淺拷貝
+        let copyMiddleName = [...middleName];
+        //將copyMiddleName中重複的資料刪除
+        for (let item of repeat) {
+          if (copyMiddleName.includes(item)) {
+            copyMiddleName = copyMiddleName.filter((x) => x !== item);
+          }
+        }
+        let notRepeat = copyMiddleName;
+        //如果notRepeat沒有資料，印出"沒有"
+        if (notRepeat.length === 0) {
+          console.log("沒有");
+          return;
+        }
+        let index = middleName.indexOf(notRepeat[0]);
+        console.log(data[index]);
+      }
+      func("彭大牆", "陳王明雅", "吳明"); // print 彭大牆
+      func("郭靜雅", "王立強", "郭林靜宜", "郭立恆", "林花花"); // print 林花花
+      func("郭宣雅", "林靜宜", "郭宣恆", "林靜花"); // print 沒有
+      func("郭宣雅", "夏曼藍波安", "郭宣恆"); // print 夏曼藍波安
+
+      console.log("***Task 4***");
+      function getNumber(index) {
+        // 0, 4, 8, 7, 11, 15, 14, 18, 22, 21, 25
+        // 從0開始，+4,+4,-1,+4,+4,-1
+        // index為0,1,3,4.6.7的值+2(%3=1 or 0)
+        // index 為2,5,8的值-1 (%3=2)
+        let number = [0];
+        let range = [];
+        for (i = 0; i < index; i++) {
+          range.push(i);
+        }
+        for (let i of range) {
+          if (i % 3 == 0 || i % 3 == 1) {
+            number.push(number[number.length - 1] + 4);
+          }
+          if (i % 3 == 2) {
+            number.push(number[number.length - 1] - 1);
+          }
+        }
+        console.log(number[number.length - 1]);
+      }
+      getNumber(1); // print 4
+      getNumber(5); // print 15
+      getNumber(10); // print 25
+      getNumber(30); // print 70
+    </script>
+  </body>
+</html>
