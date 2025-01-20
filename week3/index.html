@@ -25,19 +25,19 @@
     </div>
     <div class="main-content">
       <div class="small-box margin-right">
-        <div id=first3 class="small-box-picture">
+        <div id="first3" class="small-box-picture">
           <img src="picture.jpg" width="100%" height="100%" />
         </div>
         <div>Promotion 1</div>
       </div>
       <div class="small-box margin-right">
-        <div id=first3 class="small-box-picture">
+        <div id="first3" class="small-box-picture">
           <img src="picture.jpg" width="100%" height="100%" />
         </div>
         <div>Promotion 2</div>
       </div>
       <div class="small-box">
-        <div id=first3 class="small-box-picture">
+        <div id="first3" class="small-box-picture">
           <img src="picture.jpg" width="100%" height="100%" />
         </div>
         <div>Promotion 3</div>
@@ -96,21 +96,44 @@
         })
         .then((data) => {
           let result = data.data.results; //拿到資料
-          let first3=document.querySelectorAll('#first3');//抓到img的父節點
-          for(let i=0;i<first3.length;i++){
-            let img=document.createElement('img');//每一個迴圈建立一個img用來放圖片
-            let title=document.createElement('div');//每一個迴圈建立一個div用來放地點標題
-            let text=document.createTextNode(result[i].stitle);//建立正確標題文字
-            img.className='width_height_100';//圖片新增classname
-            img.src='http'+result[i].filelist.split('http')[1];//將多個url分割取第一個
-            first3[i].innerHTML="";//清空原本的節點
-            first3[i].appendChild(img);//將圖片節點加入父節點
-            title.appendChild(text);//將文字節點加入div節點
-            first3[i].nextElementSibling.innerHTML=""//清空兄弟節點
-            first3[i].nextElementSibling.appendChild(title)//兄弟節點加上新的div節點
+          let first3 = document.querySelectorAll("#first3"); //抓到img的父節點
+          for (let i = 0; i < first3.length; i++) {
+            let img = document.createElement("img"); //每一個迴圈建立一個img用來放圖片
+            let title = document.createElement("div"); //每一個迴圈建立一個div用來放地點標題
+            let text = document.createTextNode(result[i].stitle); //建立正確標題文字
+            img.className = "width_height_100"; //圖片新增classname
+            img.src = "http" + result[i].filelist.split("http")[1]; //將多個url分割取第一個
+            // first3[i].innerHTML="";
+            first3[i].removeChild(first3[i].children[0]); //清空原本的節點
+            first3[i].appendChild(img); //將圖片節點加入父節點
+            title.appendChild(text); //將文字節點加入div節點
+            first3[i].nextElementSibling.innerHTML = ""; //清空兄弟節點
+            first3[i].nextElementSibling.appendChild(title); //兄弟節點加上新的div節點
+          }
+          //接下來的在box的backgroung-image
+          let bigBox = document.querySelector('.big-box');
+          let box = document.querySelectorAll('.box');
+          let boxTitle = document.querySelectorAll('.box-title');
+          for(i=0;i<box.length;i++){
+            let newBox=document.createElement('div');
+            let newImg=document.createElement('img');
+            let newBoxTitle=document.createElement('div');
+            newImg.className="width_height_30px";
+            newImg.src="star.png";
+            newBoxTitle.className="box-title";
+            newBox.className="box";
+            bigBox.removeChild(box[i]);
+            bigBox.appendChild(newBox);
+            newBox.appendChild(newImg,newBoxTitle);
+            let newTitle=document.createTextNode(result[i+3].stitle);
+            newBoxTitle.style.textOverflow="ellipsis";
+            newBoxTitle.style.overflow="hidden";
+            newBoxTitle.style.whiteSpace="nowrap";
+            newBoxTitle.appendChild(newTitle);
+            newBox.appendChild(newBoxTitle);
+            newBox.style.backgroundImage="url('http" + result[i+3].filelist.split("http")[1]+"')";
           }
         });
-        
     </script>
   </body>
 </html>

@@ -8,6 +8,10 @@ body{
     height: 100%;
 }
 
+.width_height_30px{
+    width: 30px;
+    height: 30px;
+}
 @media(max-width:1920px){
     .navbar{
         height: 42.5px;
