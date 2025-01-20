@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>wehelp week1-1hui</title>
+    <link rel="stylesheet" href="week3.css" />
+    <link rel="stylesheet" href="medium.css" />
+    <link rel="stylesheet" href="mobile.css" />
+  </head>
+  <body>
+    <div class="navbar">
+      <div style="font-weight: bolder">My Website</div>
+      <img id="hambur" src="hambur.png" height="100%" />
+      <div class="menu" id="menu">
+        <img id="cross" src="cross.png" width="20px" height="20px" />
+        <div class="item">Item 1</div>
+        <div class="item">Item 2</div>
+        <div class="item">Item 3</div>
+        <div class="item">Item 4</div>
+      </div>
+    </div>
+    <div class="welcome">
+      <div style="font-weight: bolder">Welcome to MyHome</div>
+    </div>
+    <div class="main-content">
+      <div class="small-box margin-right">
+        <div id=first3 class="small-box-picture">
+          <img src="picture.jpg" width="100%" height="100%" />
+        </div>
+        <div>Promotion 1</div>
+      </div>
+      <div class="small-box margin-right">
+        <div id=first3 class="small-box-picture">
+          <img src="picture.jpg" width="100%" height="100%" />
+        </div>
+        <div>Promotion 2</div>
+      </div>
+      <div class="small-box">
+        <div id=first3 class="small-box-picture">
+          <img src="picture.jpg" width="100%" height="100%" />
+        </div>
+        <div>Promotion 3</div>
+      </div>
+    </div>
+    <div class="big-box">
+      <div class="box">
+        <img src="star.png" width="30px" height="30px" />
+        <div class="box-title">Title 1</div>
+      </div>
+      <div class="box">
+        <img src="star.png" width="30px" height="30px" />
+        <div class="box-title">Title 2</div>
+      </div>
+      <div class="box">
+        <img src="star.png" width="30px" height="30px" />
+        <div class="box-title">Title 3</div>
+      </div>
+      <div class="box">
+        <img src="star.png" width="30px" height="30px" />
+        <div class="box-title">Title 4</div>
+      </div>
+      <div class="box">
+        <img src="star.png" width="30px" height="30px" />
+        <div class="box-title">Title 5</div>
+      </div>
+      <div class="box">
+        <img src="star.png" width="30px" height="30px" />
+        <div class="box-title">Title 6</div>
+      </div>
+      <div class="box">
+        <img src="star.png" width="30px" height="30px" />
+        <div class="box-title">Title 7</div>
+      </div>
+      <div class="box">
+        <img src="star.png" width="30px" height="30px" />
+        <div class="box-title">Title 8</div>
+      </div>
+      <div class="box">
+        <img src="star.png" width="30px" height="30px" />
+        <div class="box-title">Title 9</div>
+      </div>
+      <div class="box">
+        <img src="star.png" width="30px" height="30px" />
+        <div class="box-title">Title 10</div>
+      </div>
+    </div>
+    <script src="navbar.js"></script>
+    <script>
+      //原本的Promotion部分處理
+      fetch(
+        "https://padax.github.io/taipei-day-trip-resources/taipei-attractions-assignment-1 "
+      )
+        .then(function (response) {
+          return response.json();
+        })
+        .then((data) => {
+          let result = data.data.results; //拿到資料
+          let first3=document.querySelectorAll('#first3');//抓到img的父節點
+          for(let i=0;i<first3.length;i++){
+            let img=document.createElement('img');//每一個迴圈建立一個img用來放圖片
+            let title=document.createElement('div');//每一個迴圈建立一個div用來放地點標題
+            let text=document.createTextNode(result[i].stitle);//建立正確標題文字
+            img.className='width_height_100';//圖片新增classname
+            img.src='http'+result[i].filelist.split('http')[1];//將多個url分割取第一個
+            first3[i].innerHTML="";//清空原本的節點
+            first3[i].appendChild(img);//將圖片節點加入父節點
+            title.appendChild(text);//將文字節點加入div節點
+            first3[i].nextElementSibling.innerHTML=""//清空兄弟節點
+            first3[i].nextElementSibling.appendChild(title)//兄弟節點加上新的div節點
+          }
+        });
+        
+    </script>
+  </body>
+</html>
