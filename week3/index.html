@@ -85,7 +85,11 @@
         <div class="box-title">Title 10</div>
       </div>
     </div>
+    <div class="btn">
+      <button id="btn">Load More</button>
+    </div>
     <script src="navbar.js"></script>
+    <script src="load_more.js"></script>
     <script>
       //原本的Promotion部分處理
       fetch(
@@ -111,29 +115,31 @@
             first3[i].nextElementSibling.appendChild(title); //兄弟節點加上新的div節點
           }
           //接下來的在box的backgroung-image
-          let bigBox = document.querySelector('.big-box');
-          let box = document.querySelectorAll('.box');
-          let boxTitle = document.querySelectorAll('.box-title');
-          for(i=0;i<box.length;i++){
-            let newBox=document.createElement('div');
-            let newImg=document.createElement('img');
-            let newBoxTitle=document.createElement('div');
-            newImg.className="width_height_30px";
-            newImg.src="star.png";
-            newBoxTitle.className="box-title";
-            newBox.className="box";
+          let bigBox = document.querySelector(".big-box");
+          let box = document.querySelectorAll(".box");
+          let boxTitle = document.querySelectorAll(".box-title");
+          for (i = 0; i < box.length; i++) {
+            let newBox = document.createElement("div");
+            let newImg = document.createElement("img");
+            let newBoxTitle = document.createElement("div");
+            newImg.className = "width_height_30px";
+            newImg.src = "star.png";
+            newBoxTitle.className = "box-title";
+            newBox.className = "box";
             bigBox.removeChild(box[i]);
             bigBox.appendChild(newBox);
-            newBox.appendChild(newImg,newBoxTitle);
-            let newTitle=document.createTextNode(result[i+3].stitle);
-            newBoxTitle.style.textOverflow="ellipsis";
-            newBoxTitle.style.overflow="hidden";
-            newBoxTitle.style.whiteSpace="nowrap";
+            newBox.appendChild(newImg, newBoxTitle);
+            let newTitle = document.createTextNode(result[i + 3].stitle);
+            newBoxTitle.style.textOverflow = "ellipsis";
+            newBoxTitle.style.overflow = "hidden";
+            newBoxTitle.style.whiteSpace = "nowrap";
             newBoxTitle.appendChild(newTitle);
             newBox.appendChild(newBoxTitle);
-            newBox.style.backgroundImage="url('http" + result[i+3].filelist.split("http")[1]+"')";
+            newBox.style.backgroundImage =
+              "url('http" + result[i + 3].filelist.split("http")[1] + "')";
           }
         });
+
     </script>
   </body>
 </html>

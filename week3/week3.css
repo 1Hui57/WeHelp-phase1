@@ -12,6 +12,12 @@ body{
     width: 30px;
     height: 30px;
 }
+
+.btn{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 50px;
+}
 @media(max-width:1920px){
     .navbar{
         height: 42.5px;
