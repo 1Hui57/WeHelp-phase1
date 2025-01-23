@@ -53,7 +53,7 @@ for spot in spotList:
 
 # 將資料寫入將資料寫入"spot.csv"
 import csv
-with open("spot.csv", mode="w", newline="", encoding="utf-8") as file:    
+with open("spot.csv", mode="a", newline="", encoding="utf-8") as file:    
     writer=csv.writer(file)
     for item in spotInformation:
         writer.writerow([item["title"], item["行政區"],item["longitude"],item["latitude"],item["imageURL"]])
