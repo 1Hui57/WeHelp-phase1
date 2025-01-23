@@ -44,7 +44,6 @@ function loadMore(num){
                 //將每一個新的box加到最後一個box後面
                 bigBox[bigBox.length-1].appendChild(newBox);
             }
-            
         });
 }
 

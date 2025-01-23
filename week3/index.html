@@ -111,8 +111,16 @@
             first3[i].removeChild(first3[i].children[0]); //清空原本的節點
             first3[i].appendChild(img); //將圖片節點加入父節點
             title.appendChild(text); //將文字節點加入div節點
-            first3[i].nextElementSibling.innerHTML = ""; //清空兄弟節點
-            first3[i].nextElementSibling.appendChild(title); //兄弟節點加上新的div節點
+            let parent= first3[i].parentNode //先找到first3的父節點
+            if (first3[i].nextElementSibling){
+              parent.removeChild(first3[i].nextElementSibling); //如果first3有下一個兄弟節點，透過first3的父節點移除first3的兄弟節點
+            }
+            parent.appendChild(title); //在first3的父節點中新增子節點，就會是first3的新的兄弟節點
+            //另一作法如下，沒有實際移除，沒有實際移除<div>Promotion 1</div>，而是移除文字節點
+            // while (first3[i].nextElementSibling.firstChild) {
+            //   first3[i].nextElementSibling.removeChild(first3[i].nextElementSibling.firstChild);
+            // }
+            // first3[i].nextElementSibling.appendChild(title); //兄弟節點加上新的節點
           }
           //接下來的在box的backgroung-image
           let bigBox = document.querySelector(".big-box");
