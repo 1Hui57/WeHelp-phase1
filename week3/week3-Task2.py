@@ -42,7 +42,7 @@ def getData(url):
                 times.append(timeSpans[3].get_text())
             else:
                 times.append("") #沒有時間的話新增空字串
-        #當有出現錯誤，執行下列程式(在寫程式時有很多個文章網頁打不開，因此無法取得時間，因此時間的部分會先以"錯誤"代替)
+        #當有出現錯誤，執行下列程式(在寫程式時有很多個文章網頁打不開，因此無法取得時間的網頁，時間的部分會先以"錯誤"代替)
         except:
             times.append("錯誤")
     # 將時間整合於lottery資料

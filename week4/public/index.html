@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>登入</title>
+    <link rel="stylesheet" href="/main.css" />
+  </head>
+  <body>
+    <div class="top">
+      <div class="welcome">歡迎光臨，請輸入帳號密碼</div>
+    </div>
+    <div class="sign">登入系統</div>
+    <!-- 寫一個form，輸入資料為帳號密碼 -->
+    <div class="accountAndPassword">
+      <form id="signInForm">
+        <div class="margin-bottom10">帳號：<input type="text" /></div>
+        <div class="margin-bottom10">密碼：<input type="text" /></div>
+        <div class="btn margin-bottom10">
+          同意條款<input type="checkbox" value="check" name="ok" id="check" />
+        </div>
+        <div class="btn">
+          <button onclick="signin()">登入</button>
+        </div>
+      </form>
+    </div>
+    <script>
+      async function signin() {
+        let form=document.getElementById("signInForm")
+        let formData=new FormData(form)
+        let response = await fetch("/signin", {
+          method: "POST",
+          body: formData,
+        });
+        let data = await response.json();
+        console.log(data);
+      }
+    </script>
+  </body>
+</html>
