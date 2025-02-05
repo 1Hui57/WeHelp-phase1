@@ -48,6 +48,12 @@ async def signout(request: Request):
      request.session["SIGNED-IN"] = False
      return RedirectResponse("/")
 
+# GET方法將 /square 設為平方數計算結果頁面
+@app.get("/square/{number}")
+async def square(request: Request,number: Annotated[int,Path(gt=0)]):
+     number=int(number)
+     result=number*number
+     return templates.TemplateResponse("square.html",{"request":request,"result":result})
 
 # 將URL: http://127.0.0.1:8000/設為 index.html
 app.mount("/", StaticFiles(directory="public", html=True))

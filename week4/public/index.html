@@ -1,78 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
-
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>登入</title>
     <link rel="stylesheet" href="/main.css" />
-</head>
+  </head>
 
-
-<body>
+  <body>
     <div class="top">
-        <div class="welcome">歡迎光臨，請輸入帳號密碼</div>
+      <div class="welcome">歡迎光臨，請輸入帳號密碼</div>
     </div>
     <div class="sign">登入系統</div>
     <!-- 寫一個form，輸入資料為帳號密碼 -->
     <div class="accountAndPassword">
-        <form id="signInForm">
-            <label for="account">帳號：</label>
-            <input type="text" name="account" id="account" class="margin-bottom10" /><br>
-            <label for="password">密碼：</label>
-            <input type="text" name="password" id="password" class="margin-bottom10" /><br>
-            <div class="btn">
-                <label for="check">同意條款</label>
-                <input type="checkbox" value="check" name="check" id="check" class="margin-bottom10" />
-            </div>
-            <div class="btn">
-                <!-- 設為submit，點擊會將資料傳送給後端 -->
-                <button type="submit">登入</button>
-            </div>
-        </form>
+      <form id="signInForm">
+        <label for="account">帳號：</label>
+        <input
+          type="text"
+          name="account"
+          id="account"
+          class="margin-bottom10"
+        /><br />
+        <label for="password">密碼：</label>
+        <input
+          type="text"
+          name="password"
+          id="password"
+          class="margin-bottom10"
+        /><br />
+        <div class="btn">
+          <label for="check">同意條款</label>
+          <input
+            type="checkbox"
+            value="check"
+            name="check"
+            id="check"
+            class="margin-bottom10"
+          />
+        </div>
+        <div class="btn margin-bottom10">
+          <!-- 設為submit，點擊會將資料傳送給後端 -->
+          <button type="submit">登入</button>
+        </div>
+      </form>
+    </div>
+    <hr />
+    <div class="sign">計算正整數的平方</div>
+    <!-- 寫一個form，輸入資料為數字 -->
+    <div class="accountAndPassword">
+      <form id="calForm" action="/square/" method="get">
+        <label for="number">正整數：</label>
+        <input
+          type="text"
+          name="number"
+          id="number"
+          class="margin-bottom10"
+        /><br />
+        <div class="btn margin-bottom10">
+          <!-- 設為submit，點擊會將資料傳送給後端 -->
+          <button type="submit">計算</button>
+        </div>
+      </form>
     </div>
     <script>
-        // 抓取form的DOM
-        const form = document.getElementById("signInForm");
-        //抓取各個input的DOM
-        const check = document.getElementById("check");
-        const account = document.getElementById("account");
-        const password = document.getElementById("password");
-        //監聽form事件
-        form.addEventListener("submit", async function (event) {
-            event.preventDefault();
-            //將input的DOM資料放入變數
-            let checkOk = check.checked;
-            let accountValue = account.value;
-            let passwordValue = password.value;
-            //檢查是否勾選同意條款，沒有則跳出警告
-            if (!checkOk) {
-                alert("請先勾選同意條款");
-                return; // 停止執行
-            };
-            console.log(accountValue);
-            console.log(passwordValue);
-            // console.log(formData);
-            const formData = new FormData(form);
-            let response = await fetch("/signin", {
-                method: "POST",
-                body:formData
-            });
-            let data = await response.json();
-            // console.log(data);
-            if (data.status==="success"){
-              window.location.href="/member";
-            }
-            else if (data.status==="empty"){
-                window.location.href="/error?message=請輸入帳號、密碼";
-            }
-            else if (data.status==="error"){
-                window.location.href="/error?message=帳號或密碼輸入錯誤"
-            }
+      // 登入系統的code
+
+      // 抓取form的DOM
+      const form = document.getElementById("signInForm");
+      //抓取各個input的DOM
+      const check = document.getElementById("check");
+      const account = document.getElementById("account");
+      const password = document.getElementById("password");
+      //監聽form事件
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        //將input的DOM資料放入變數
+        let checkOk = check.checked;
+        let accountValue = account.value;
+        let passwordValue = password.value;
+        //檢查是否勾選同意條款，沒有則跳出警告
+        if (!checkOk) {
+          alert("請先勾選同意條款");
+          return; // 停止執行
+        }
+        console.log(accountValue);
+        console.log(passwordValue);
+        // console.log(formData);
+        const formData = new FormData(form);
+        let response = await fetch("/signin", {
+          method: "POST",
+          body: formData,
         });
+        let data = await response.json();
+        // console.log(data);
+        if (data.status === "success") {
+          window.location.href = "/member";
+        } else if (data.status === "empty") {
+          window.location.href = "/error?message=請輸入帳號、密碼";
+        } else if (data.status === "error") {
+          window.location.href = "/error?message=帳號或密碼輸入錯誤";
+        }
+      });
     </script>
-</body>
+    <script>
+      //計算平方數的code
 
-
+      // 抓取form的DOM
+      const calForm = document.getElementById("calForm");
+      const numberDOM = document.getElementById("number");
+      calForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const number = document.getElementById("number").value;
+        if (number.trim() === "" || isNaN(number) || number <= 0 || Number.isInteger(Number(number))===false) {
+          alert("請輸入一個正整數");
+          return;
+        }
+        // 跳轉到 /square/{number}
+        window.location.href = `/square/${number}`;
+      });
+    </script>
+  </body>
 </html>
