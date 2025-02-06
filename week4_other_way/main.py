@@ -1,15 +1,11 @@
 from fastapi import FastAPI, Body, Form, Path, Query, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import (
-    JSONResponse,
-    PlainTextResponse,
-    HTMLResponse,
     FileResponse,
     RedirectResponse,
 )
 from typing import Annotated
 from fastapi.templating import Jinja2Templates
-import json
 
 # 驗證使用者狀態
 from starlette.applications import Starlette
@@ -30,12 +26,18 @@ async def login(
     if account == "test" and password == "test":
         # 設定 SIGNED-IN cookie登入狀態時為True
         request.session["SIGNED-IN"] = True
-        return {"status": "success"}
+        return RedirectResponse("/member",status_code=303)
+    # RedirectResponse 預設會用 status_code=307（Temporary Redirect），
+    # 這會保持原始請求的方法（也就是 POST），所以 FastAPI 會嘗試用 POST 方法來存取 /member，
+    # 但 /member 只接受 GET，因此會回傳 405 Method Not Allowed。
+    # 可以明確指定 RedirectResponse 使用 status_code=303（See Other），
+    # 這樣瀏覽器會以 GET 方法重新導向 /member
     elif account == "" or password == "":
-        return {"status": "empty"}
+        request.session["SIGNED-IN"] = False
+        return RedirectResponse("/error?message=請輸入帳號密碼",status_code=303)
     else:
-        return {"status": "error"}
-
+        request.session["SIGNED-IN"] = False
+        return RedirectResponse("/error?message=帳號或密碼輸入錯誤",status_code=303)
 
 # GET方法將 http://127.0.0.1:8000/member 設為 登入成功畫面
 @app.get("/member")
@@ -45,13 +47,12 @@ def memberPage(
     if request.session.get("SIGNED-IN") != True:
         request.session["SIGNED-IN"] = False
         return RedirectResponse("/")
-    return FileResponse("member.html")
-
+    else:
+        return FileResponse("member.html")
 
 # GET方法將/error 設為錯誤頁面
-@app.get(
-    "/error"
-)  # TemplateResponse已經預設 response_class=HTMLResponse，所以可以不用特別寫
+@app.get("/error")  
+# TemplateResponse已經預設 response_class=HTMLResponse，所以可以不用特別寫
 async def errorPage(request: Request, message: str ):  # message為要求字串
     return templates.TemplateResponse(
         "error.html", {"request": request, "message": message}
@@ -61,8 +62,7 @@ async def errorPage(request: Request, message: str ):  # message為要求字串
 @app.get("/signout")
 async def signout(request: Request):
     request.session["SIGNED-IN"] = False
-    return RedirectResponse("/")
-
+    return RedirectResponse("/",status_code=303)
 
 # GET方法將 /square 設為平方數計算結果頁面
 @app.get("/square/{number}")
@@ -72,7 +72,6 @@ async def square(request: Request, number: Annotated[int, Path(gt=0)]):
     return templates.TemplateResponse(
         "square.html", {"request": request, "result": result}
     )
-
 
 # 將URL: http://127.0.0.1:8000/設為 index.html
 app.mount("/", StaticFiles(directory="public", html=True))
