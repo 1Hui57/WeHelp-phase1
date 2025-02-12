@@ -160,7 +160,7 @@ update member set name='test2' where username='test';
 * SELECT how many rows from the member table. 
 語法
 ```
-explain select * from member;
+select count(id) from member;
 ```
 執行結果
 
