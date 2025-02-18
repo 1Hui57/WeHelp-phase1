@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>登入</title>
+    <link rel="stylesheet" href="/main.css" />
+  </head>
+
+  <body>
+    <div class="top">
+      <div class="welcome">歡迎光臨，請註冊登入系統</div>
+    </div>
+    <div class="sign">註冊帳號</div>
+    <!-- 寫一個form，註冊並輸入姓名帳號密碼 -->
+    <div class="accountAndPassword">
+      <form id="signUpForm" action="/signup" method="POST">
+        <label for="name">姓名</label>
+        <input
+          type="text"
+          name="name"
+          id="name"
+          class="margin-bottom10"
+        /><br />
+        <label for="account">帳號</label>
+        <input
+          type="text"
+          name="account"
+          id="account"
+          class="margin-bottom10"
+        /><br />
+        <label for="password">密碼</label>
+        <input
+          type="text"
+          name="password"
+          id="password"
+          class="margin-bottom10"
+        /><br />
+        <div class="btn margin-bottom10">
+          <!-- 設為submit，點擊會將資料傳送給後端 -->
+          <button id="btn">註冊</button>
+        </div>
+      </form>
+    </div>
+    <hr />
+    <div class="sign">登入系統</div>
+    <!-- 寫一個form，輸入資料為數字 -->
+    <div class="accountAndPassword">
+      <form id="signInForm" action="/signin" method="POST">
+        <label for="signInAccount">帳號</label>
+        <input
+          type="text"
+          name="signInAccount"
+          id="signInAccount"
+          class="margin-bottom10"
+        /><br />
+        <label for="signInPassword">密碼</label>
+        <input
+          type="text"
+          name="signInPassword"
+          id="signInPassword"
+          class="margin-bottom10"
+        /><br />
+        <div class="btn margin-bottom10">
+          <!-- 設為submit，點擊會將資料傳送給後端 -->
+          <button id="signInBtn">登入</button>
+        </div>
+      </form>
+    </div>
+    <script>
+      // 註冊系統的code
+
+      //抓取各個input的DOM
+      const btn = document.getElementById("btn");
+      const signUpName = document.getElementById("name");
+      const signUpAccount = document.getElementById("account");
+      const signUpPasword = document.getElementById("password");
+      //監聽按下button時是否以輸入帳號密碼
+      btn.addEventListener("click", function () {
+        if (signUpName.value==="" || signUpAccount.value==="" || signUpPasword.value==="") {
+          alert("註冊請輸入姓名、帳號及密碼");
+          event.preventDefault(); //或是return false;停止執行
+        };
+      });
+    </script>
+    <script>
+      // 登入系統的code
+
+      //抓取各個input的DOM
+      const signInBtn = document.getElementById("signInBtn");
+      const signInAccount = document.getElementById("signInAccount");
+      const signInPassword = document.getElementById("signInPassword");
+      //監聽按下button時是否以輸入帳號密碼
+      signInBtn.addEventListener("click", function () {
+        if (signInAccount.value==="" || signInPassword.value==="") {
+          alert("登入系統請輸入帳號及密碼");
+          event.preventDefault(); //或是return false;停止執行
+        };
+      });
+    </script>
+  </body>
+</html>
