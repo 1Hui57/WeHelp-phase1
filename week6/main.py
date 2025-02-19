@@ -41,10 +41,10 @@ async def signup(
             request.session["SIGNED-IN"] = False
             return RedirectResponse("/error?message=重複使用者名稱",status_code=303)
         # 將輸入的名稱、帳號、密碼加進資料庫中
-        cursor.execute("INSERT INTO member (name, username, password) VALUES (%s, %s, %s)", [name, account, password])
-        con.commit()
-        request.session["SIGNED-IN"] = False
-        return RedirectResponse("/",status_code=303)
+    cursor.execute("INSERT INTO member (name, username, password) VALUES (%s, %s, %s)", [name, account, password])
+    con.commit()
+    request.session["SIGNED-IN"] = False
+    return RedirectResponse("/",status_code=303)
 
 # 處理 POST 方法的路徑 /signin
 @app.post("/signin")
