@@ -32,12 +32,15 @@ async def signup(
     request:Request, name:Annotated[str,Form()],account:Annotated[str,Form(),],password:Annotated[str,Form()]
 ):
     cursor=con.cursor()
+    # 取得資料庫內帳號的資料
     cursor.execute("SELECT * FROM member")
     memberData=cursor.fetchall()
+    # 比對輸入的帳號是否與資料庫內的帳號相同
     for element in memberData:
         if element[2]==account:
             request.session["SIGNED-IN"] = False
             return RedirectResponse("/error?message=重複使用者名稱",status_code=303)
+        # 將輸入的名稱、帳號、密碼加進資料庫中
         cursor.execute("INSERT INTO member (name, username, password) VALUES (%s, %s, %s)", [name, account, password])
         con.commit()
         request.session["SIGNED-IN"] = False
@@ -56,7 +59,7 @@ async def login(
         # 當輸入的帳號密碼為資料庫其中一筆，進到登入頁面
         if signInAccount == element[2] and signInPassword == element[3]:
             # 設定 SIGNED-IN cookie登入狀態時為True
-            # 設定 USERNAME cookie 登入狀態時為 帳號
+            # 設定 USER_INFO cookie 登入狀態時為 帳號資料
             request.session["SIGNED-IN"] = True
             request.session["USER_INFO"] = {
                 "id":element[0],
@@ -80,12 +83,13 @@ def memberPage(
     request: Request,
 ):
     cursor=con.cursor()
-    cursor.execute("SELECT message.content, member.name FROM message INNER JOIN member ON message.member_id=member.id ORDER BY message.time DESC;")
+    # 取得資料庫中會員與留言的資料
+    cursor.execute("SELECT message.id, message.content, member.name ,member_id FROM message INNER JOIN member ON message.member_id=member.id ORDER BY message.time DESC;")
     messageData=cursor.fetchall()
     con.commit()
     message=[]
     for msg in messageData:
-        message.append({"name":msg[1],"content":msg[0]})
+        message.append({"id":msg[0],"content":msg[1],"name":msg[2], "member_id":msg[3]})
     if request.session.get("SIGNED-IN") != True:
         request.session["SIGNED-IN"] = False
         return RedirectResponse("/")
@@ -106,14 +110,14 @@ async def errorPage(request: Request, message: str ):  # message為要求字串
         "error.html", {"request": request, "message": message}
     )
 
-# GET方法將 /signout 設為回到首頁並設定SIGNED-IN = False
+# GET方法將 /signout 設為回到首頁並設定SIGNED-IN = False，並刪除USER_INFO的session
 @app.get("/signout")
 async def signout(request: Request):
     request.session["SIGNED-IN"] = False
     del request.session["USER_INFO"]
     return RedirectResponse("/",status_code=303)
 
-# POST 方法將 使用者輸入的訊息送至後端並串接資料庫
+# POST 方法設定路徑/createMessage 將使用者輸入的訊息送至後端並串接資料庫
 @app.post("/createMessage")
 def createMessage(
     request:Request, content:Annotated[str,Form()]
@@ -125,6 +129,20 @@ def createMessage(
     cursor.execute("INSERT INTO message (member_id, content) VALUES (%s, %s)", [id, content])
     con.commit()
     return RedirectResponse("/member",status_code=303)
+
+# POST方法設定路徑/deleteMessage 將訊息確認後刪除並返回/member
+@app.post("/deleteMessage")
+def deleteMessage(
+    request:Request, message_id:Annotated[int,Form()],member_id:Annotated[int,Form()]
+):
+    cursor=con.cursor()
+    USER_INFO=request.session["USER_INFO"]
+    if USER_INFO["id"]==member_id:
+        cursor.execute("DELETE FROM message WHERE id=%s",[message_id])
+        con.commit()
+        return RedirectResponse("/member",status_code=303)
+    else:
+        return RedirectResponse("/",status_code=303)
 
 # 將URL: http://127.0.0.1:8000/設為 index.html
 app.mount("/", StaticFiles(directory="public", html=True))
