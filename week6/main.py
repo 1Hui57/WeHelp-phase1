@@ -51,6 +51,7 @@ async def login(
     cursor=con.cursor()
     cursor.execute("SELECT * FROM member")
     memberData=cursor.fetchall()
+    con.commit()
     for element in memberData:
         # 當輸入的帳號密碼為資料庫其中一筆，進到登入頁面
         if signInAccount == element[2] and signInPassword == element[3]:
@@ -81,6 +82,7 @@ def memberPage(
     cursor=con.cursor()
     cursor.execute("SELECT message.content, member.name FROM message INNER JOIN member ON message.member_id=member.id ORDER BY message.time DESC;")
     messageData=cursor.fetchall()
+    con.commit()
     message=[]
     for msg in messageData:
         message.append({"name":msg[1],"content":msg[0]})
@@ -112,12 +114,17 @@ async def signout(request: Request):
     return RedirectResponse("/",status_code=303)
 
 # POST 方法將 使用者輸入的訊息送至後端並串接資料庫
-@app.post("createMessage")
+@app.post("/createMessage")
 def createMessage(
     request:Request, content:Annotated[str,Form()]
 ):
+    # 拿到使用者狀態中的名字
+    user_info=request.session.get("USER_INFO")
+    id=user_info["id"]
     cursor=con.cursor()
-
+    cursor.execute("INSERT INTO message (member_id, content) VALUES (%s, %s)", [id, content])
+    con.commit()
+    return RedirectResponse("/member",status_code=303)
 
 # 將URL: http://127.0.0.1:8000/設為 index.html
 app.mount("/", StaticFiles(directory="public", html=True))
