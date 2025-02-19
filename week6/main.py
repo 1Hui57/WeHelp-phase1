@@ -78,13 +78,19 @@ async def login(
 def memberPage(
     request: Request,
 ):
+    cursor=con.cursor()
+    cursor.execute("SELECT message.content, member.name FROM message INNER JOIN member ON message.member_id=member.id ORDER BY message.time DESC;")
+    messageData=cursor.fetchall()
+    message=[]
+    for msg in messageData:
+        message.append({"name":msg[1],"content":msg[0]})
     if request.session.get("SIGNED-IN") != True:
         request.session["SIGNED-IN"] = False
         return RedirectResponse("/")
     elif request.session.get("SIGNED-IN") == True and request.session["USER_INFO"]:
         USER_INFO=request.session["USER_INFO"]
         return templates.TemplateResponse(
-            "member.html",{"request": request, "USER_INFO":USER_INFO}
+            "member.html",{"request": request, "USER_INFO":USER_INFO, "message":message}
         )
     else:
         request.session["SIGNED-IN"] = False
@@ -102,16 +108,16 @@ async def errorPage(request: Request, message: str ):  # message為要求字串
 @app.get("/signout")
 async def signout(request: Request):
     request.session["SIGNED-IN"] = False
+    del request.session["USER_INFO"]
     return RedirectResponse("/",status_code=303)
 
-# GET方法將 /square 設為平方數計算結果頁面
-@app.get("/square/{number}")
-async def square(request: Request, number: Annotated[int, Path(gt=0)]):
-    number = int(number)
-    result = number * number
-    return templates.TemplateResponse(
-        "square.html", {"request": request, "result": result}
-    )
+# POST 方法將 使用者輸入的訊息送至後端並串接資料庫
+@app.post("createMessage")
+def createMessage(
+    request:Request, content:Annotated[str,Form()]
+):
+    cursor=con.cursor()
+
 
 # 將URL: http://127.0.0.1:8000/設為 index.html
 app.mount("/", StaticFiles(directory="public", html=True))

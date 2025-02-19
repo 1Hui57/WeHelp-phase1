@@ -30,13 +30,43 @@
         margin: 10px auto 0 auto;
         font-size: 15px;
       }
+      .message{
+        max-width: 500px;
+        margin: 10px auto 10px auto;
+        text-align: center;
+      }
     </style>
+    <link rel="stylesheet" href="/main.css">
   </head>
   <body>
     <div class="top">
       <div class="welcome">歡迎光臨，這是會員頁</div>
     </div>
     <div class="congratulation">{{USER_INFO.name}}，歡迎登入系統</div>
-    <div class="center"><a href="/signout" class="center">登出系統</a></div>
+    <div class="center" style="margin-bottom: 40px;"><a href="/signout" class="center">登出系統</a></div>
+    <hr />
+    <div class="sign">快來留言吧</div>
+    <!-- 寫一個form，註冊並輸入姓名帳號密碼 -->
+    <div class="accountAndPassword">
+      <form id="createMessageForm" action="/createMessage" method="POST">
+        <label for="content">內容</label>
+        <input
+          type="text"
+          name="content"
+          id="content"
+          class="margin-bottom10"
+        /><br />
+        <div class="btn" style="margin-bottom: 30px;">
+          <!-- 設為submit，點擊會將資料傳送給後端 -->
+          <button id="btn_createMessage">送出</button>
+        </div>
+      </form>
+    </div>
+    <hr />
+    {% for message in message %}
+    <div class="message">
+      <span style="font-weight: bold;">{{message.name}}：</span>{{message.content}}
+    </div>
+    {% endfor %}
   </body>
 </html>
