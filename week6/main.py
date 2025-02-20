@@ -33,14 +33,14 @@ async def signup(
 ):
     cursor=con.cursor()
     # 取得資料庫內帳號的資料
-    cursor.execute("SELECT * FROM member")
+    cursor.execute("SELECT member.username FROM member")
     memberData=cursor.fetchall()
     # 比對輸入的帳號是否與資料庫內的帳號相同
     for element in memberData:
-        if element[2]==account:
+        if element==account:
             request.session["SIGNED-IN"] = False
             return RedirectResponse("/error?message=重複使用者名稱",status_code=303)
-        # 將輸入的名稱、帳號、密碼加進資料庫中
+    # 將輸入的名稱、帳號、密碼加進資料庫中
     cursor.execute("INSERT INTO member (name, username, password) VALUES (%s, %s, %s)", [name, account, password])
     con.commit()
     request.session["SIGNED-IN"] = False
@@ -52,7 +52,7 @@ async def login(
     request: Request, signInAccount: Annotated[str, Form()], signInPassword: Annotated[str, Form()]
 ):
     cursor=con.cursor()
-    cursor.execute("SELECT * FROM member")
+    cursor.execute("SELECT member.id, member.name, member.username , member.password FROM member")
     memberData=cursor.fetchall()
     con.commit()
     for element in memberData:
