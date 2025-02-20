@@ -136,7 +136,9 @@ def deleteMessage(
     # ,member_id:Annotated[int,Form()]
     cursor=con.cursor()
     USER_INFO=request.session["USER_INFO"]
+    # 取得USER_INFO session的會員id
     user_info_id = USER_INFO["id"]
+    # 驗證message_id在資料庫中的member_id是否與USER_INFO session的會員id相同
     cursor.execute("SELECT id FROM message WHERE member_id=%s AND id=%s" ,[user_info_id, message_id])
     getMessageId=cursor.fetchone()
     if getMessageId is not None and getMessageId[0]==message_id:
