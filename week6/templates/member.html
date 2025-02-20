@@ -73,7 +73,7 @@
       <form id="deleteForm" action="/deleteMessage" method="POST">
         <!-- 以form傳送message_id和member_id -->
         <input type="hidden" name="message_id" value="{{ message.id }}" />
-        <input type="hidden" name="member_id" value="{{ message.member_id }}" />
+        <!-- <input type="hidden" name="member_id" value="{{ message.member_id }}" /> -->
         <span
           style="font-weight: bold"
           message_id="{{message.id}}"

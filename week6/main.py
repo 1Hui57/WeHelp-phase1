@@ -132,16 +132,19 @@ def createMessage(
 # POST方法設定路徑/deleteMessage 將訊息確認後刪除並返回/member
 @app.post("/deleteMessage")
 def deleteMessage(
-    request:Request, message_id:Annotated[int,Form()],member_id:Annotated[int,Form()]
-):
+    request:Request, message_id:Annotated[int,Form()]):
+    # ,member_id:Annotated[int,Form()]
     cursor=con.cursor()
     USER_INFO=request.session["USER_INFO"]
-    if USER_INFO["id"]==member_id:
+    user_info_id = USER_INFO["id"]
+    cursor.execute("SELECT id FROM message WHERE member_id=%s AND id=%s" ,[user_info_id, message_id])
+    getMessageId=cursor.fetchone()
+    if getMessageId is not None and getMessageId[0]==message_id:
         cursor.execute("DELETE FROM message WHERE id=%s",[message_id])
         con.commit()
         return RedirectResponse("/member",status_code=303)
     else:
-        return RedirectResponse("/",status_code=303)
+        return RedirectResponse("/error?message=無法刪除該留言，請重新登入。",status_code=303)
 
 # 將URL: http://127.0.0.1:8000/設為 index.html
 app.mount("/", StaticFiles(directory="public", html=True))
