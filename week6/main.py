@@ -32,42 +32,41 @@ async def signup(
     request:Request, name:Annotated[str,Form()],account:Annotated[str,Form(),],password:Annotated[str,Form()]
 ):
     cursor=con.cursor()
-    # 取得資料庫內帳號的資料
-    cursor.execute("SELECT member.username FROM member")
-    memberData=cursor.fetchall()
-    # 比對輸入的帳號是否與資料庫內的帳號相同
-    for element in memberData:
-        if element==account:
-            request.session["SIGNED-IN"] = False
-            return RedirectResponse("/error?message=重複使用者名稱",status_code=303)
-    # 將輸入的名稱、帳號、密碼加進資料庫中
-    cursor.execute("INSERT INTO member (name, username, password) VALUES (%s, %s, %s)", [name, account, password])
-    con.commit()
-    request.session["SIGNED-IN"] = False
-    return RedirectResponse("/",status_code=303)
+    cursor.execute("SELECT username FROM member WHERE username=%s",[account])
+    memberData=cursor.fetchone()
+    # 比對輸入的帳號是否存在於資料庫內
+    # memberData沒有資料時，如果只寫 memberData[0]==account會出現錯誤，因為memberData沒有[0]
+    if memberData is not None and memberData[0] ==account:
+        # 資料庫已有此筆帳號，進入錯誤頁面並顯示"重複使用者名稱"
+        request.session["SIGNED-IN"] = False
+        return RedirectResponse("/error?message=重複使用者名稱",status_code=303)
+    # 若輸入的帳號不存在資料庫中，則將輸入的名稱、帳號、密碼加進資料庫中
+    else:
+        cursor.execute("INSERT INTO member (name, username, password) VALUES (%s, %s, %s)", [name, account, password])
+        con.commit()
+        request.session["SIGNED-IN"] = False
+        return RedirectResponse("/",status_code=303)
 
 # 處理 POST 方法的路徑 /signin
 @app.post("/signin")
 async def login(
     request: Request, signInAccount: Annotated[str, Form()], signInPassword: Annotated[str, Form()]
 ):
+    # 若登入的帳號密碼為資料庫的同一筆資料，則成功登入，並帶有帳號的USER_INFO session
     cursor=con.cursor()
-    cursor.execute("SELECT member.id, member.name, member.username , member.password FROM member")
-    memberData=cursor.fetchall()
-    con.commit()
-    for element in memberData:
-        # 當輸入的帳號密碼為資料庫其中一筆，進到登入頁面
-        if signInAccount == element[2] and signInPassword == element[3]:
-            # 設定 SIGNED-IN cookie登入狀態時為True
-            # 設定 USER_INFO cookie 登入狀態時為 帳號資料
-            request.session["SIGNED-IN"] = True
-            request.session["USER_INFO"] = {
-                "id":element[0],
-                "name":element[1],
-                "username":element[2]
-            }
-            return RedirectResponse("/member",status_code=303)
-        
+    cursor.execute("SELECT id, name, username FROM member WHERE username=%s AND password=%s",[signInAccount, signInPassword])
+    memberData=cursor.fetchone()
+    # 當輸入的帳號密碼為資料庫其中一筆，進到登入頁面
+    if memberData is not None and memberData[2]==signInAccount:
+        # 設定 SIGNED-IN cookie登入狀態時為True
+        # 設定 USER_INFO cookie 登入狀態時為 帳號資料
+        request.session["SIGNED-IN"] = True
+        request.session["USER_INFO"] = {
+            "id":memberData[0],
+            "name":memberData[1],
+            "username":memberData[2]
+        }
+        return RedirectResponse("/member",status_code=303)    
         # RedirectResponse 預設會用 status_code=307（Temporary Redirect），
         # 這會保持原始請求的方法（也就是 POST），所以 FastAPI 會嘗試用 POST 方法來存取 /member，
         # 但 /member 只接受 GET，因此會回傳 405 Method Not Allowed。
