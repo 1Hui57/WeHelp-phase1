@@ -155,9 +155,10 @@ async def findUserName(
     cursor=con.cursor()
     cursor.execute("SELECT id, name, username FROM member WHERE username=%s",[username])
     memberData=cursor.fetchone()
-    if memberData is None:
+    if memberData is None or request.session.get("SIGNED-IN") == False or request.session.get("USER_INFO")==None:
+        memberData=None
         return {"data":memberData}
-    elif memberData is not None:
+    else:
         return {
             "data":{
                 "id":memberData[0],
@@ -165,5 +166,27 @@ async def findUserName(
                 "username":memberData[2]
             }
         }
+
+# PATCH方法設定路徑/api/member
+@app.patch("/api/member")
+async def updateName(
+    request:Request,
+):
+    data = await request.json()
+    USER_INFO=request.session["USER_INFO"]
+    if request.session.get("SIGNED-IN") == True and request.session["USER_INFO"]:
+        # 取得USER_INFO session的會員id
+        user_info_id = USER_INFO["id"]
+        cursor=con.cursor()
+        try:
+            cursor.execute("UPDATE member SET name=%s WHERE id=%s",[data['name'],user_info_id])
+            con.commit()
+            return{"ok":True}
+        except:
+            return {"error":True}
+    else:
+        return {"error":True}
+
+
 # 將URL: http://127.0.0.1:8000/設為 index.html
 app.mount("/", StaticFiles(directory="public", html=True))

@@ -10,7 +10,9 @@
     <div class="top">
       <div class="welcome">歡迎光臨，這是會員頁</div>
     </div>
-    <div class="congratulation">{{USER_INFO.name}}，歡迎登入系統</div>
+    <div class="congratulation" id="welcomeHome">
+      {{USER_INFO.name}}，歡迎登入系統
+    </div>
     <div class="center" style="margin-bottom: 40px">
       <a href="/signout" class="center">登出系統</a>
     </div>
@@ -68,29 +70,34 @@
         </span>
       </form>
     </div>
-    <div class="center" id="resultName"style="margin-top: 0; font-size: 18px"></div>
-
-    <!-- 更新我的姓名的form -->
+    <div
+      class="center"
+      id="resultName"
+      style="margin-top: 0; font-size: 18px"
+    ></div>
+    <!-- 更新我的姓名 -->
     <div class="sign fontweight_bold">更新我的姓名</div>
-    <div class="accountAndPassword">
-      <form id="updateMyName">
-        <input
-          style="font-size: 15px"
-          type="text"
-          name="updateName"
-          id="updateName"
-          class="margin-bottom10"
-        />
-        <span style="margin-bottom: 30px">
-          <!-- 設為submit，點擊會將資料傳送給後端 -->
-          <button id="btn_updateMyName" type="submit">更新</button>
-        </span>
-      </form>
+    <div style="margin-left: auto; margin-right: auto; width: fit-content;">
+      <input
+        style="font-size: 15px"
+        type="text"
+        name="updateName"
+        id="updateName"
+        class="margin-bottom10"
+      />
+      <span style="margin-bottom: 30px">
+        <!-- 點擊會將資料傳送給後端 -->
+        <button id="btn_updateMyName">更新</button>
+      </span>
     </div>
-    <div class="center" style="margin-top: 0; font-size: 18px">更新成功</div>
+    <div
+      class="center"
+      id="updateResult"
+      style="margin-top: 0; font-size: 18px; margin-bottom: 50px;"
+    ></div>
   </body>
   <script>
-    // 查詢姓名
+    // 查詢姓名程式
     // 抓取DOM
     const findNameForm = document.getElementById("findNameForm");
     const findNameInput = document.getElementById("findName");
@@ -106,29 +113,59 @@
         return;
       }
       // 連線至後端
-      let response= await fetch(`/api/member?username=${findValue}`,{
-        method:"GET"
+      let response = await fetch(`/api/member?username=${findValue}`, {
+        method: "GET",
       });
-      let data= await response.json();
-      if(data["data"]===null){
-        resultName.innerText="請輸入正確帳號"
+      let data = await response.json();
+      if (data["data"] === null) {
+        resultName.innerText = "請輸入正確帳號";
+      } else if (data["data"] && data["data"]["name"]) {
+        resultName.innerText = `${data["data"]["name"]} (${data["data"]["username"]})`;
       }
-      if(data["data"]["name"]){
-        resultName.innerText=`${data["data"]["name"]} (${data["data"]["username"]})`
+    });
+
+    //更新姓名程式
+    const btn_updateMyName = document.getElementById("btn_updateMyName");
+    btn_updateMyName.addEventListener("click", async function () {
+      event.preventDefault();
+      let updateNameInput = document.getElementById("updateName").value;
+      // 如沒輸入，則跳出警告
+      if (updateNameInput === "") {
+        alert("請輸入欲更改之姓名再按下更新，謝謝。");
+        event.preventDefault();
       }
+      else if(updateNameInput===userName){
+        alert("請勿輸入相同姓名。");
+        event.preventDefault();
+      }
+      else{
+        //送出patch連線
+      let response = await fetch("/api/member", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: updateNameInput }),
+      });
+      let data = await response.json();
+      let updateResult = document.getElementById("updateResult");
+      let welcomeHome = document.getElementById("welcomeHome");
+      if (data["ok"]) {
+        updateResult.innerText = "更新成功";
+        welcomeHome.innerText = `${updateNameInput}，歡迎登入系統`;
+      } else if (data["error"]) {
+        updateResult.innerText("更新失敗");
+      }}
     });
   </script>
   <script>
-    // 如留言空白，跳出警告，且無法送出表單
-    let messageContent = document.getElementById("content");
-    let createMessageBtn = document.getElementById("btn_createMessage");
-    createMessageBtn.addEventListener("click", function () {
-      event.preventDefault();
-      if (messageContent.value === "") {
+   // 如留言空白，跳出警告，且無法送出表單
+   let messageContent=document.getElementById("content");
+    let createMessageBtn=document.getElementById("btn_createMessage");
+    createMessageBtn.addEventListener("click",function(){
+      if(messageContent.value===""){
         alert("請輸入留言內容:)");
         event.preventDefault();
       }
-    });
+    })
 
     // 如果留言與登入的使用者為同一人，顯示刪除按鈕
     // 抓取使用者的名字
@@ -144,7 +181,6 @@
         deleteBtn[i].classList.add("displayNone");
       }
     }
-
     // 按下刪除鈕鍵時跳出確認方框，若取消則表單不送出
     let delForm = document.getElementById("deleteForm");
     delForm.addEventListener("submit", async function (event) {
